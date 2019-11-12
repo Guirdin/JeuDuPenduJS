@@ -1,0 +1,238 @@
+﻿<head>
+<meta charset="utf-8">
+<title>Le jeu du pendu</title>
+<link href='Styles.css' rel='stylesheet'/>
+<script src="ListeMots.js"></script>
+</head>
+
+
+<body onkeydown="clavier(event)">
+
+	<div style="width:100%; height:auto; text-align:center;">
+		<div class="div_conteneur_page">	
+			
+			<div style="width:100%;display:block;text-align:center;"></div>
+			
+			<div class="Saut_Ligne" style="height:30px;"></div>						
+			
+			<div style="float:left;width:10%;height:40px;"></div>
+			<div style="float:left;width:80%;height:40px;text-align:center;">
+			<div style="width:auto;display:block;height:auto;text-align:center;background-color:#e76f0d;padding-top:12px;box-shadow: 6px 6px 0px #aaa;color:#fcfcfc;">
+			<h1>Le Pendu</h1>
+			</div>
+			</div>
+			
+			<div class="Saut_Ligne"></div>		
+			
+			<div style="width:100%;height:auto;text-align:center;">
+						
+			<div style="width:800px;display:inline-block;" id="conteneur">
+			
+				<div class="centre">
+	
+				</div>		
+			
+				<div class="Block" id="colonne_gauche">
+					<div id="LeMotCache" style="font-size:20px;letter-spacing:2px;">
+					Mot à trouver
+					</div>
+					<div id="leScore">
+					Score : 0 <br> Mots restants : 10
+					</div>
+					<input type="button" value="Démmarer" onClick="Demmarer()"/>
+				</div>
+				<img src="img_pendu/pendu0.png" alt="" id="lePendu" style="height:220px;" />
+				</div>
+				
+				<div class="centre" id="Clavier">
+					<div class="Block_Clavier" id="Clavier_Virtuel" style="height:140px;padding-left:50px;width:620px;">
+						<div class="lettre" id="calque_a">A</div>
+						<div class="lettre" id="calque_b">B</div>
+						<div class="lettre" id="calque_c">C</div>
+						<div class="lettre" id="calque_d">D</div>
+						<div class="lettre" id="calque_e">E</div>
+						<div class="lettre" id="calque_f">F</div>
+						<div class="lettre" id="calque_g">G</div>
+						<div class="lettre" id="calque_h">H</div>
+						<div class="lettre" id="calque_i">I</div>
+						<div class="lettre" id="calque_j">J</div>
+						<div class="lettre" id="calque_k">K</div>
+						<div class="lettre" id="calque_l">L</div>
+						<div class="lettre" id="calque_m">M</div>
+						<div class="Saut_Ligne" style="height:50px;" id="saut1">
+						<div class="lettre" id="calque_n">N</div>
+						<div class="lettre" id="calque_o">O</div>
+						<div class="lettre" id="calque_p">P</div>
+						<div class="lettre" id="calque_q">Q</div>
+						<div class="lettre" id="calque_r">R</div>
+						<div class="lettre" id="calque_s">S</div>
+						<div class="lettre" id="calque_t">T</div>
+						<div class="lettre" id="calque_u">U</div>
+						<div class="lettre" id="calque_v">V</div>
+						<div class="lettre" id="calque_w">W</div>
+						<div class="lettre" id="calque_x">X</div>
+						<div class="lettre" id="calque_y">Y</div>
+						<div class="lettre" id="calque_z">Z</div>
+						<div class="Saut_Ligne" style="height:50px;" id="saut2">
+						<div class="lettre" id="calque_0">0</div>
+						<div class="lettre" id="calque_1">1</div>
+						<div class="lettre" id="calque_2">2</div>
+						<div class="lettre" id="calque_3">3</div>
+						<div class="lettre" id="calque_4">4</div>
+						<div class="lettre" id="calque_5">5</div>
+						<div class="lettre" id="calque_6">6</div>
+						<div class="lettre" id="calque_7">7</div>
+						<div class="lettre" id="calque_8">8</div>
+						<div class="lettre" id="calque_9">9</div>
+					</div>	
+				</div>					
+				
+			</div>
+			
+			</div>
+
+			<div class="Saut_Ligne" style="height:50px;">
+			</div>	
+			
+			</div>
+		</div>
+	
+	</div>
+	
+</body>
+<script type="text/javascript" language="javascript">
+	
+	let Erreurs = 0;
+	let Scores = 10;
+	let Lettres_Accepter ="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+	let Mots_Restants = 0;
+	let Mot_Memoire = "";
+	let Touche ="";
+	let Nb_Mots = 0;
+	let Mots_Utiliser = "";
+	let Tab_Mots;
+	let Mot = "";
+	let Fin = true;
+	
+	let Stok_Clavier = document.getElementById('Clavier_Virtuel'); // Permet de stocker les propriétées du conteneur Clavier
+	let Calques = Stok_Clavier.getElementsByTagName('div'); // Permet de pointer les div
+
+	Tab_Mots = Mots_Mystere().split(':'); // réception du mot à trouver et mise en plce d'un séparateur
+	Nb_Mots = Tab_Mots.length;	// renvoie du nombre de mots de la variable Tab_Mots
+
+	
+	function Demmarer()
+	{
+		Fin = false; nb_coups = 0; Mots_Utiliser =""; Mots_Restants = 0; Erreurs = 0; Scores = 0; // Réinitialisation des variables
+		Mot_Suivant();
+	}	
+	
+	function Mot_Suivant()
+	{	
+		Efface_Calques(); // Permet de réinitialisé les claques
+
+		let Nb_Alea = Math.floor(Math.random()* Nb_Mots ); // Permet de donner un nombre aléatoire par rapport à Nb_Mots
+	
+		document.getElementById("leScore").innerHTML = "Score : " + Scores + "<br> Mots restants : "+ (10 - Mots_Restants);
+		// Permet de réécrire dans la div leScore afin de mettre les résultats à jour
+	
+		document.getElementById("lePendu").src = "img_pendu/pendu0.png";
+		Erreurs = 0;	// Permet de réinitialisé le pendu
+	
+		while(Mots_Utiliser.indexOf("-" + Nb_Alea + "-")>-1) // Permet de ne pas récupérer le même mot à trouver dans une même partie
+		{
+			Nb_Alea = Math.floor(Math.random()*Nb_Mots);
+		}
+	
+		Mots_Utiliser += "-" + Nb_Alea + "-";
+		Mot = Tab_Mots[Nb_Alea]; // Permet de tiré un mot à trouver et le stock dans un tableau
+		Mot_Memoire = Mot.toUpperCase(); // Passe le contenu de la variable Mot en Majuscule et le stock dans Mot_Memoire
+		Mot = Mot.toUpperCase().replace(/[A-Z0-9]/g, "_"); // Permet visuelement de remplacer les lettres et chiffres par des tirés
+	
+		document.getElementById("LeMotCache").innerHTML = Mot;
+	}
+
+	function Efface_Calques()
+	{
+		for (let i = 0; i < Calques.length; i++) // Permet de parcourir les calques
+		{
+		if(Calques[i].id != 'saut1' && Calques[i].id !='saut2')
+		Calques[i].style.backgroundColor = '#EDEEEE';
+		}
+	}
+
+	function clavier(evenement)
+	{ 
+		let Indice = 0;
+		let La_Lettre = '';
+		let Trouve = false;
+		
+		if(Fin==true)
+		{
+			return;
+		}
+
+		let touche = window.event ? evenement.keyCode : evenement.which; // Permet d'utiliser la bonne propriéter selon le navigateur
+		touche = String.fromCharCode(touche).substr(0,1);
+	
+		if(touche == " ") // Permet de vérifier si la touche saisie par l'utilisateur est l'espace
+		{
+			Touche = " "; // Si la touche est l'espace alors 
+			return; // On sort de la fonction
+		}
+	
+		if(Lettres_Accepter.indexOf(touche)== -1) // Permet de vérifier si le saisie de touche se trouve dans la chaine de letttres_ok
+			return; // Sinon on sort de la fonction
+		
+		document.getElementById("calque_" + touche.toLowerCase()).style.backgroundColor="#666666";
+		// Permet de pointer sur le claque correspondant à la touche saisie et de griser cette dernière sur le clavier virtuel
+	
+		for(Indice=0; Indice<=Mot_Memoire.length-1;Indice++ ) // Permet de vérifier les lettres du mots une par une
+		{
+			La_Lettre = Mot_Memoire.substr(Indice,1); // Permet de passer d'une lettre à une autre
+			
+			if(La_Lettre == touche) // Permet de révéler la bonne lettre saisie
+			{
+				Trouve = true;
+				Mot = Mot.substr(0,Indice) + La_Lettre + Mot.substr(Indice+1); // Permet de remplacer les tiré par la lettre trouvé
+				document.getElementById("LeMotCache").innerHTML = Mot; // Permet d'afficher le mot remplacer
+			}
+		}
+		
+		if(Trouve == true) // Permet de savoir si toutes les lettres ont bien était trouvé
+		{
+			
+			if(Mot == Mot_Memoire) // Permet d'afficher le score et de mettre un délai avant le mot Mot_Suivant
+			{
+				Scores++;
+				Mots_Restants++;
+				if(Mots_Restants == 10) // Affiche le score final et met Fin au jeu
+				{
+					document.getElementById("leScore").innerHTML = "Score : " + Scores + "<br> Mots restants : "+ (10 - Mots_Restants);
+					Fin = true;
+				}
+				else // Produit 1 seconde avant l'initialisation du prochain mot
+				{
+					window.setTimeout(function attendre() { Mot_Suivant(); },1000);
+				}
+			}
+		}
+	
+		else // Permet de contabiliser l'erreur de l'utilisateur et de change l'image du pendu en fonction de celles ci
+		{
+			Erreurs++; // Contabilise l'erreurs de l'utilisateur
+			document.getElementById("lePendu").src = "img_pendu/pendu"+ Erreurs +".png"; // change l'image du pendu
+			if (Erreurs == 6)
+			{
+				Mots_Restants++;
+				Scores--;
+				if(Mots_Restants==10)
+				Fin = true;
+				window.setTimeout(function attendre(){ Mot_Suivant(); }, 1000);
+			}
+		}
+	
+	}		
+</script>
+</html>
+	
